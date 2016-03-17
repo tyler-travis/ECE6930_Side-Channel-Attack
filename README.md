@@ -1,1 +1,1 @@
-# ECE6930_Side-Channel-Attack
+# ECE6930_Side-Channel-AttackSide-Channel Attack for a Tiva-C DES implmentation
