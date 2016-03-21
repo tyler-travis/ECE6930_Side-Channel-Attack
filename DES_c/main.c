@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 const uint8_t IP[64] = {57, 49, 41, 33, 25, 17, 9,  1,
                         59, 51, 43, 35, 27, 19, 11, 3,
@@ -110,7 +111,72 @@ const uint8_t S_box8[4][16] = {
   	{2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11}
 };
 
+void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
+void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
+void create_subkeys(uint8_t key[8], uint8_t subkey[][6]);
+void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
+
 int main(int argc, char** argv)
 {
+    // Test key: 1334 5779 9BBC DFF1
+    uint8_t key[8] = { 0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1 };
 
+    // Test message: 0123 4567 89AB CDEF
+    uint8_t plain_text[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
+
+    // plain_text_size = 8
+    uint16_t plain_text_size = sizeof(plain_text);
+
+    // TODO: Figure out how to determine the size of the cipher text
+    // based on the size of the plain text
+    uint8_t cipher_text[8];
+
+    encrypt(plain_text, plain_text_size, cipher_text, key);
+
+}
+
+void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8])
+{
+    // 2d array to hold all the generated subkeys for DES
+    uint8_t subkey[16][6];
+    
+    // Create the subkeys from the key
+    create_subkeys(key, subkey);
+}
+
+void create_subkey(uint8_t key[8], uint8_t subkey[][6])
+{
+    // K+ permuted key array, Use the PS_1 permutation array to move the bits around
+    uint8_t permuted_key[7];
+    
+}
+
+void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit)
+{
+    // Find which byte to look in
+    uint8_t source_byte = source_bit/8;
+
+    // Get the bit offset relative to the byte
+    uint8_t source_bit_offset = source_bit%8;
+
+    // Get the data from at the byte
+    uint8_t source_byte_data = source[source_byte];
+
+    // Get what the bit is
+    uint8_t source_bit_data = ((0x1 << source_bit_offset) & source_byte_data) >> source_bit_offset;
+
+    // Find which byte to store the value in
+    uint8_t dest_byte = dest_bit/8;
+
+    // Get the bit taht we need to store the value in
+    uint8_t dest_bit_offset = dest_bit%8;
+    
+    // Get the byte data
+    uint8_t dest_byte_data = dest[dest_byte];
+
+    //                                | get a mask for the data|   | Shift data to correct spot       |
+    dest_byte_data = dest_byte_data & (~(0x1 << dest_bit_offset) & (source_bit_data << dest_bit_offset));
+
+    // Store the data back into the array
+    dest[dest_byte] = dest_byte_data;
 }
