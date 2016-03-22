@@ -113,8 +113,8 @@ const uint8_t S_box8[4][16] = {
 
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
 void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
-void create_subkeys(uint8_t key[8], uint8_t subkey[][6]);
-void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
+void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
+void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
 
 int main(int argc, char** argv)
 {
@@ -141,17 +141,27 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     uint8_t subkey[16][6];
     
     // Create the subkeys from the key
-    create_subkeys(key, subkey);
+    generate_subkeys(key, subkey);
 }
 
-void create_subkey(uint8_t key[8], uint8_t subkey[][6])
+void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
 {
     // K+ permuted key array, Use the PS_1 permutation array to move the bits around
-    uint8_t permuted_key[7];
-    
+    uint8_t permuted_key[8];
+
+    printf("%x%x %x%x %x%x %x%x\n", key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7]);
+
+    for(int i = 0; i < 56; ++i)
+    {
+        copy_bit(key, permuted_key, i, PC_1[i]);
+    }
+
+    printf("%x%x %x%x %x%x %x%x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
+            permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6], permuted_key[7]);
+
 }
 
-void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit)
+void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit)
 {
     // Find which byte to look in
     uint8_t source_byte = source_bit/8;
@@ -165,6 +175,25 @@ void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
     // Get what the bit is
     uint8_t source_bit_data = ((0x1 << source_bit_offset) & source_byte_data) >> source_bit_offset;
 
+
+    // Get the correct bit for dest
+    if(dest_bit >=7)
+        dest_bit += 1;
+    if(dest_bit >=15)
+        dest_bit += 1;
+    if(dest_bit >=23)
+        dest_bit += 1;
+    if(dest_bit >=31)
+        dest_bit += 1;
+    if(dest_bit >=39)
+        dest_bit += 1;
+    if(dest_bit >=47)
+        dest_bit += 1;
+    if(dest_bit >=55)
+        dest_bit += 1;
+    if(dest_bit >=63)
+        dest_bit += 1;
+
     // Find which byte to store the value in
     uint8_t dest_byte = dest_bit/8;
 
@@ -174,8 +203,30 @@ void move_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
     // Get the byte data
     uint8_t dest_byte_data = dest[dest_byte];
 
-    //                                | get a mask for the data|   | Shift data to correct spot       |
-    dest_byte_data = dest_byte_data & (~(0x1 << dest_bit_offset) & (source_bit_data << dest_bit_offset));
+    // mask for the bit destination
+    uint8_t dest_mask;
+
+    // the bit data for the destination
+    uint8_t dest_bit_data = source_bit_data << dest_bit_offset;
+
+    if(source_bit_data == 0x1)
+    {
+        dest_mask = 0x0;
+        dest_byte_data = dest_byte_data | (dest_mask | dest_bit_data);
+    }
+    else
+    {
+        dest_mask = ~(0x1 << dest_bit_offset);
+        dest_byte_data = dest_byte_data & dest_mask;
+    }
+
+    //printf("source byte = %d\nsource bit offset = %d\nsource byte data = 0x%x\nsource bit data = 0x%x\n\n", 
+            //source_byte, source_bit_offset, source_byte_data, source_bit_data);
+
+    //printf("dest byte = %d\ndest bit offset = %d\ndest byte data = 0x%x\ndest mask = 0x%x\ndest bit data = 0x%x\n\n",
+            //dest_byte, dest_bit_offset, dest_byte_data, dest_mask, dest_bit_data);
+
+    //printf("dest byte data final = 0x%x\n\n\n", dest_byte_data);
 
     // Store the data back into the array
     dest[dest_byte] = dest_byte_data;
