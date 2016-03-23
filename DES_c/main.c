@@ -117,6 +117,8 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
 void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]);
 void fFucntion(uint8_t *rightHalve, uint8_t subKey[6]);
 void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
+void circular_shift_array(uint8_t array[4], uint8_t shift);
+void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
 
 int main(int argc, char** argv)
 {
@@ -136,9 +138,17 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
 {
     // 2d array to hold all the generated subkeys for DES
     uint8_t subkey[16][6];
+    uint8_t i;
     
     // Create the subkeys from the key
     generate_subkeys(key, subkey);
+
+    for(i = 0; i < 16; ++i)
+    {
+        printf("subkey[%d] = 0x%02x%02x %02x%02x %02x%02x\n\n", i, 
+                subkey[i][0], subkey[i][1], subkey[i][2], 
+                subkey[i][3], subkey[i][4], subkey[i][5]);
+    }
 
     // Send Input through IP (Initial Permutation)
 
@@ -157,7 +167,11 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
 {
     // K+ permuted key array, Use the PS_1 permutation array to move the bits around
     uint8_t permuted_key[7] = {0};
-    uint32_t i;
+    uint32_t i, j;
+    uint8_t C[17][4];
+    uint8_t D[17][4];
+    uint8_t temp_array[7];
+    uint8_t temp;
 
     printf("%x%x %x%x %x%x %x%x\n", key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7]);
 
@@ -167,9 +181,58 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     }
     
 
-    //printf("%x%x %x%x %x%x %x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
-    //        permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6]);
+    printf("%x%x %x%x %x%x %x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
+            permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6]);
 
+    // Initial setup for splitting the key
+    // For the C array:
+    //      The mask: 0x0FFFFFFF should perserve all data
+    //      That is the reason for the shifting
+    // For the D array:
+    //      Everything already aligns well
+    C[0][0] = permuted_key[0] >> 4 & 0x0F;
+    C[0][1] = (permuted_key[1] >> 4 & 0x0F) | permuted_key[0] << 4;
+    C[0][2] = (permuted_key[2] >> 4 & 0x0F) | permuted_key[1] << 4;
+    C[0][3] = (permuted_key[3] >> 4 & 0x0F) | permuted_key[2] << 4;
+
+    D[0][0] = permuted_key[3] & 0x0F;
+    D[0][1] = permuted_key[4];
+    D[0][2] = permuted_key[5];
+    D[0][3] = permuted_key[6];
+
+    //printf("C[0][0] = 0x%02x\nC[0][1] = 0x%02x\nC[0][2] = 0x%02x\nC[0][3] = 0x%02x\n\n",
+            //C[0][0], C[0][1], C[0][2], C[0][3]);
+
+    //printf("D[0][0] = 0x%02x\nD[0][1] = 0x%02x\nD[0][2] = 0x%02x\nD[0][3] = 0x%02x\n\n",
+            //D[0][0], D[0][1], D[0][2], D[0][3]);
+
+    // Generate the next 15 C-D pairs by circular shifting
+    // using the ISV array
+    for(i = 1; i < 17; ++i)
+    {
+        memcpy(C[i], C[i-1], sizeof(C[i]));
+        memcpy(D[i], D[i-1], sizeof(D[i]));
+        circular_shift_array(C[i], ISV[i-1]);
+        circular_shift_array(D[i], ISV[i-1]);
+
+        //printf("C[%d][0] = 0x%02x\nC[%d][1] = 0x%02x\nC[%d][2] = 0x%02x\nC[%d][3] = 0x%02x\n\n",
+                //i, C[i][0], i, C[i][1], i, C[i][2], i, C[i][3]);
+
+        //printf("D[%d][0] = 0x%02x\nD[%d][1] = 0x%02x\nD[%d][2] = 0x%02x\nD[%d][3] = 0x%02x\n\n",
+                //i, D[i][0], i, D[i][1], i, D[i][2], i, D[i][3]);
+        
+        combine_CD(C[i], D[i], temp_array);
+        
+        //printf("i = %d -> temp_array = 0x%02x%02x %02x%02x %02x%02x %02x\n", i,
+                //temp_array[0], temp_array[1], temp_array[2], 
+                //temp_array[3], temp_array[4], temp_array[5], temp_array[6]);
+        for(j = 0; j < 48; ++j)
+        {
+            copy_bit(temp_array, subkey[i-1], PC_2[j], j);
+        }
+        //printf("%02x%02x %02x%02x %02x%02x\n\n\n", subkey[i-1][0], subkey[i-1][1], subkey[i-1][2], 
+                //subkey[i-1][3], subkey[i-1][4], subkey[i-1][5]);
+    }
 }
 
 void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]){
@@ -236,14 +299,47 @@ void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
         dest_byte_data = dest_byte_data & dest_mask;
     }
 
-    //printf("source bit = %d\nsource byte = %d\nsource bit offset = %d\nsource byte data = 0x%x\nsource bit data = 0x%x\n\n", 
-    //       source_bit, source_byte, source_bit_offset, source_byte_data, source_bit_data);
-
-    //printf("dest bit = %d\ndest byte = %d\ndest bit offset = %d\ndest byte data = 0x%x\ndest mask = 0x%x\ndest bit data = 0x%x\n\n",
-    //        dest_bit, dest_byte, dest_bit_offset, dest_byte_data, dest_mask, dest_bit_data);
-
-    //printf("dest byte data final = 0x%x\n\n\n", dest_byte_data);
-
     // Store the data back into the array
     dest[dest_byte] = dest_byte_data;
+}
+
+void circular_shift_array(uint8_t array[4], uint8_t shift)
+{
+    uint8_t temp[4];
+    if(shift == 1)
+    {
+        temp[0] = (array[0] & 0x08) >> 3;
+        temp[1] = (array[1] & 0x80) >> 7;
+        temp[2] = (array[2] & 0x80) >> 7;
+        temp[3] = (array[3] & 0x80) >> 7;
+
+        array[0] = (array[0] << shift & 0x0F) | temp[1];
+        array[1] = (array[1] << shift) | temp[2];
+        array[2] = (array[2] << shift) | temp[3];
+        array[3] = (array[3] << shift) | temp[0];
+    }
+    else if(shift == 2)
+    {
+        temp[0] = (array[0] & 0x0C) >> 2;
+        temp[1] = (array[1] & 0xC0) >> 6;
+        temp[2] = (array[2] & 0xC0) >> 6;
+        temp[3] = (array[3] & 0xC0) >> 6;
+
+        array[0] = (array[0] << shift & 0x0F) | temp[1];
+        array[1] = (array[1] << shift) | temp[2];
+        array[2] = (array[2] << shift) | temp[3];
+        array[3] = (array[3] << shift) | temp[0];
+    }
+}
+
+void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7])
+{
+    uint8_t temp;
+    dest[0] = (C[0] << 4) | ((C[1] >> 4) & 0x0F);
+    dest[1] = (C[1] << 4) | ((C[2] >> 4) & 0x0F);
+    dest[2] = (C[2] << 4) | ((C[3] >> 4) & 0x0F);
+    dest[3] = (C[3] << 4) | (D[0] & 0x0F);
+    dest[4] = D[1];
+    dest[5] = D[2];
+    dest[6] = D[3];
 }
