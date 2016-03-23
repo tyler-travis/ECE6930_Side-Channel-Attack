@@ -114,8 +114,8 @@ const uint8_t S_box8[4][16] = {
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
 void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
-uint8_t* desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t *subkey);
-uint8_t* fFucntion(uint8_t *rightHalve, uint8_t *subKey);
+void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]);
+void fFucntion(uint8_t *rightHalve, uint8_t subKey[6]);
 void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
 
 int main(int argc, char** argv)
@@ -150,7 +150,7 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     // Recombine final Left and Right Halves
 
     // Send 64 bit recombination into FP (Final Permutation)
-    
+
 }
 
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
@@ -171,16 +171,16 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
 
 }
 
-uint8_t* desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t *subkey){
+void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]){
 
     //Send R_i and subKey into fFuntion()
 
     //XOR Output of fFunction() with L_i
 
-    //Return Result of XOR (Result is new R_i for next round)
+    //End of Function
 }
 
-uint8_t* fFucntion(uint8_t *rightHalve, uint8_t *subKey){
+void fFucntion(uint8_t *rightHalve, uint8_t subKey[6]){
 
     //Send rightHalve to E permutation
 
@@ -190,7 +190,7 @@ uint8_t* fFucntion(uint8_t *rightHalve, uint8_t *subKey){
 
     //Send output of Switch Boxes into P permutation
 
-    //Return result of P permutation
+    //End of Function
 
 }
 
