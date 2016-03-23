@@ -114,23 +114,20 @@ const uint8_t S_box8[4][16] = {
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
 void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
+uint8_t* desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t *subkey);
+uint8_t* fFucntion(uint8_t *rightHalve, uint8_t *subKey);
 void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
 
 int main(int argc, char** argv)
 {
-    // Test key: 1334 5779 9BBC DFF1
-    uint8_t key[8] = { 0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1 };
-
-    // Test message: 0123 4567 89AB CDEF
-    uint8_t plain_text[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
-
-    // plain_text_size = 8
-    uint16_t plain_text_size = sizeof(plain_text);
-
-    // TODO: Figure out how to determine the size of the cipher text
-    // based on the size of the plain text
+    
+    uint8_t key[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1}; // Test key: 1334 5779 9BBC DFF1
+    uint8_t keyHW[8] = {0x6a, 0x65, 0x78, 0x6A, 0x65, 0x78, 0x6A, 0x65}; //KEY FOR HW SECURITY
+    uint8_t plain_text[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
+    uint16_t plain_text_size = sizeof(plain_text); // plain_text_size = 8 
     uint8_t cipher_text[8];
 
+    //Run DES Encryption
     encrypt(plain_text, plain_text_size, cipher_text, key);
 
 }
@@ -142,22 +139,58 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     
     // Create the subkeys from the key
     generate_subkeys(key, subkey);
+
+    // Send Input through IP (Initial Permutation)
+
+    // Split 64 bits into two 32 bit chunks (L & R)
+
+    // Round 1 through 16
+    //desRound();
+
+    // Recombine final Left and Right Halves
+
+    // Send 64 bit recombination into FP (Final Permutation)
+    
 }
 
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
 {
     // K+ permuted key array, Use the PS_1 permutation array to move the bits around
     uint8_t permuted_key[8];
+    uint32_t i;
 
     printf("%x%x %x%x %x%x %x%x\n", key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7]);
 
-    for(int i = 0; i < 56; ++i)
+    for(i = 0; i < 56; ++i)
     {
         copy_bit(key, permuted_key, i, PC_1[i]);
     }
 
     printf("%x%x %x%x %x%x %x%x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
             permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6], permuted_key[7]);
+
+}
+
+uint8_t* desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t *subkey){
+
+    //Send R_i and subKey into fFuntion()
+
+    //XOR Output of fFunction() with L_i
+
+    //Return Result of XOR (Result is new R_i for next round)
+}
+
+uint8_t* fFucntion(uint8_t *rightHalve, uint8_t *subKey){
+
+    //Send rightHalve to E permutation
+
+    //XOR subKey with output of E
+
+    //Send output of XOR into Switch Boxes
+
+    //Send output of Switch Boxes into P permutation
+
+    //Return result of P permutation
 
 }
 
