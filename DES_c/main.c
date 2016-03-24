@@ -1,3 +1,11 @@
+//----------------------------------------------------
+//
+//  Code: DES Encryption
+//  Authors: Tyler Travis & Justin Cox
+//  Date: 3/23/16
+//
+//----------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -114,8 +122,8 @@ const uint8_t S_box8[4][16] = {
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
 void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
-void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]);
-void fFucntion(uint8_t *rightHalve, uint8_t subKey[6]);
+void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]);
+void fFunction(uint8_t rightHalve[], uint8_t subKey[6]);
 void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
 void circular_shift_array(uint8_t array[4], uint8_t shift);
 void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
@@ -125,12 +133,15 @@ int main(int argc, char** argv)
     
     uint8_t key[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1}; // Test key: 1334 5779 9BBC DFF1
     uint8_t keyHW[8] = {0x6a, 0x65, 0x78, 0x6A, 0x65, 0x78, 0x6A, 0x65}; //KEY FOR HW SECURITY
-    uint8_t plain_text[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
+    uint8_t plain_text[8] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
     uint16_t plain_text_size = sizeof(plain_text); // plain_text_size = 8 
     uint8_t cipher_text[8];
 
     //Run DES Encryption
     encrypt(plain_text, plain_text_size, cipher_text, key);
+
+    printf("Cipher Text: %02x%02x %02x%02x %02x%02x %02x%02x\n", cipher_text[0], cipher_text[1], cipher_text[2], 
+            cipher_text[3], cipher_text[4], cipher_text[5], cipher_text[6], cipher_text[7]);
 
 }
 
@@ -138,6 +149,11 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
 {
     // 2d array to hold all the generated subkeys for DES
     uint8_t subkey[16][6];
+    uint8_t plain_textIP[8] = {0};
+    uint8_t cipher_textPreFP[8] = {0};
+
+    uint8_t leftHalve[4] = {0};
+    uint8_t rightHalve[4] = {0};
     uint8_t i;
     
     // Create the subkeys from the key
@@ -151,16 +167,53 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     }
 
     // Send Input through IP (Initial Permutation)
+    for(i = 0; i < 64; ++i)
+    {
+        copy_bit(plain_text, plain_textIP, IP[i], i);
+    }
+
+    //printf("IP: %02x%02x %02x%02x %02x%02x %02x%02x\n", plain_textIP[0], plain_textIP[1], plain_textIP[2], 
+    //        plain_textIP[3], plain_textIP[4], plain_textIP[5], plain_textIP[6], plain_textIP[7]);    
 
     // Split 64 bits into two 32 bit chunks (L & R)
+    leftHalve[0] = plain_textIP[0];
+    leftHalve[1] = plain_textIP[1];
+    leftHalve[2] = plain_textIP[2];
+    leftHalve[3] = plain_textIP[3];
+
+    rightHalve[0] = plain_textIP[4];
+    rightHalve[1] = plain_textIP[5];
+    rightHalve[2] = plain_textIP[6];
+    rightHalve[3] = plain_textIP[7];
 
     // Round 1 through 16
-    //desRound();
+    for(i = 0; i < 16; i++){
+        desRound(leftHalve, rightHalve, subkey[i]);
+
+        //printf("L_%d: %02x%02x %02x%02x\n", i, leftHalve[0], leftHalve[1], leftHalve[2], 
+        //    leftHalve[3]);
+
+        //printf("R_%d: %02x%02x %02x%02x\n", i, rightHalve[0], rightHalve[1], rightHalve[2], 
+        //    rightHalve[3]);
+    }
 
     // Recombine final Left and Right Halves
+    cipher_textPreFP[0] = rightHalve[0];
+    cipher_textPreFP[1] = rightHalve[1];
+    cipher_textPreFP[2] = rightHalve[2];
+    cipher_textPreFP[3] = rightHalve[3];
+
+    cipher_textPreFP[4] = leftHalve[0];
+    cipher_textPreFP[5] = leftHalve[1];
+    cipher_textPreFP[6] = leftHalve[2];
+    cipher_textPreFP[7] = leftHalve[3];
 
     // Send 64 bit recombination into FP (Final Permutation)
+    for(i = 0; i < 64; i++){
+        copy_bit(cipher_textPreFP, cipher_text, FP[i], i); 
+    }
 
+    //End of Function
 }
 
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
@@ -235,25 +288,150 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     }
 }
 
-void desRound(uint8_t *leftHalve, uint8_t *rightHalve, uint8_t subkey[6]){
+void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]){
+
+    uint8_t rightTemp[4];
+
+    //Keep copy of R_i
+    rightTemp[0] = rightHalve[0];
+    rightTemp[1] = rightHalve[1];
+    rightTemp[2] = rightHalve[2];
+    rightTemp[3] = rightHalve[3];
 
     //Send R_i and subKey into fFuntion()
-    //fFunction();
+    fFunction(rightHalve, subkey);
 
     //XOR Output of fFunction() with L_i
+    rightHalve[0] = rightHalve[0] ^ leftHalve[0];
+    rightHalve[1] = rightHalve[1] ^ leftHalve[1];
+    rightHalve[2] = rightHalve[2] ^ leftHalve[2];
+    rightHalve[3] = rightHalve[3] ^ leftHalve[3];
+
+    //Make L_i+1 = R_i for next round
+    leftHalve[0] = rightTemp[0];
+    leftHalve[1] = rightTemp[1];
+    leftHalve[2] = rightTemp[2];
+    leftHalve[3] = rightTemp[3];
 
     //End of Function
 }
 
-void fFucntion(uint8_t *rightHalve, uint8_t subKey[6]){
+void fFunction(uint8_t rightHalve[], uint8_t subKey[6]){
+
+    uint8_t rightHalveE[6] = {0};
+    uint8_t rowBits = 0;
+    uint8_t colBits = 0;
+    uint8_t post_Sbox_R[4] = {0};
+    
+    uint32_t i;
 
     //Send rightHalve to E permutation
+    for(i = 0; i < 48; i++){
+        copy_bit(rightHalve, rightHalveE, E[i], i);   
+    }
 
     //XOR subKey with output of E
+    for(i = 0; i < 6; i++){
+        rightHalveE[i] = rightHalveE[i] ^ subKey[i];
+    }
+
+    //printf("E: %02x%02x %02x%02x %02x%02x\n", rightHalveE[0], rightHalveE[1], rightHalveE[2], 
+    //        rightHalveE[3], rightHalveE[4], rightHalveE[5]);
 
     //Send output of XOR into Switch Boxes
+    //------------------------------------------------------------------------
+    // 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111
+    // ^      ^         ^        ^         ^      ^         ^        ^      
+    // 0      6         4        2         0      6         4        2
+    //------------------------------------------------------------------------
+    //*************
+    //  Sbox1
+    //*************
+    rowBits = (rightHalveE[0] & 0x80) >> 6;
+    rowBits |= (rightHalveE[0] & 0x04) >> 2;
+
+    colBits = (rightHalveE[0] & 0x78) >> 3;
+
+    post_Sbox_R[0] = (S_box1[rowBits][colBits] << 4);
+    //*************
+    //  Sbox2
+    //*************
+    rowBits = (rightHalveE[0] & 0x02);
+    rowBits |= (rightHalveE[1] & 0x10) >> 4;
+
+    colBits = (rightHalveE[0] & 0x01) << 3;
+    colBits |= (rightHalveE[1] & 0xE0) >> 5;
+
+    post_Sbox_R[0] |= S_box2[rowBits][colBits];
+    //printf("Sbox1&2: %02x \n", post_Sbox_R[0]);
+    //*************
+    //  Sbox3
+    //*************
+    rowBits = (rightHalveE[1] & 0x08) >> 2;
+    rowBits |= (rightHalveE[2] & 0x40) >> 6;
+
+    colBits = (rightHalveE[1] & 0x07) << 1;
+    colBits |= (rightHalveE[2] & 0x80) >> 7;
+
+    post_Sbox_R[1] = (S_box3[rowBits][colBits] << 4);
+    //*************
+    //  Sbox4
+    //*************
+    rowBits = (rightHalveE[2] & 0x20) >> 4;
+    rowBits |= (rightHalveE[2] & 0x01);
+
+    colBits = (rightHalveE[2] & 0x1E) >> 1;
+
+    post_Sbox_R[1] |= S_box4[rowBits][colBits];
+    //printf("Sbox3&4: %02x \n", post_Sbox_R[1]);
+    //*************
+    //  Sbox5
+    //*************
+    rowBits = (rightHalveE[3] & 0x80) >> 6;
+    rowBits |= (rightHalveE[3] & 0x04) >> 2;
+
+    colBits = (rightHalveE[3] & 0x78) >> 3;
+
+    post_Sbox_R[2] = (S_box5[rowBits][colBits] << 4);
+    //*************
+    //  Sbox6
+    //*************
+    rowBits = (rightHalveE[3] & 0x02);
+    rowBits |= (rightHalveE[4] & 0x10) >> 4;
+
+    colBits = (rightHalveE[3] & 0x01) << 3;
+    colBits |= (rightHalveE[4] & 0xE0) >> 5;
+
+    post_Sbox_R[2] |= S_box6[rowBits][colBits];
+    //printf("Sbox5&6: %02x \n", post_Sbox_R[2]);
+    //*************
+    //  Sbox7
+    //*************
+    rowBits = (rightHalveE[4] & 0x08) >> 2;
+    rowBits |= (rightHalveE[5] & 0x40) >> 6;
+
+    colBits = (rightHalveE[4] & 0x07) << 1;
+    colBits |= (rightHalveE[5] & 0x80) >> 7;
+
+    post_Sbox_R[3] = (S_box7[rowBits][colBits] << 4);
+    //*************
+    //  Sbox8
+    //*************
+    rowBits = (rightHalveE[5] & 0x20) >> 4;
+    rowBits |= (rightHalveE[5] & 0x01);
+
+    colBits = (rightHalveE[5] & 0x1E) >> 1;
+
+    post_Sbox_R[3] |= S_box8[rowBits][colBits];
+    //printf("Sbox7&8: %02x \n", post_Sbox_R[3]);
 
     //Send output of Switch Boxes into P permutation
+    for(i = 0; i < 32; i++){
+      copy_bit(post_Sbox_R, rightHalve, P[i], i); 
+    }
+
+    //printf("P: %02x%02x %02x%02x\n", rightHalve[0], rightHalve[1], rightHalve[2], 
+    //        rightHalve[3]);
 
     //End of Function
 
