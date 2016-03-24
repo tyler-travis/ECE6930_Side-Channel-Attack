@@ -226,16 +226,10 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     uint8_t temp_array[7];
     uint8_t temp;
 
-    printf("%x%x %x%x %x%x %x%x\n", key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7]);
-
     for(i = 0; i < 56; ++i)
     {
         copy_bit(key, permuted_key, PC_1[i], i);
     }
-    
-
-    printf("%x%x %x%x %x%x %x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
-            permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6]);
 
     // Initial setup for splitting the key
     // For the C array:
@@ -253,38 +247,27 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     D[0][2] = permuted_key[5];
     D[0][3] = permuted_key[6];
 
-    //printf("C[0][0] = 0x%02x\nC[0][1] = 0x%02x\nC[0][2] = 0x%02x\nC[0][3] = 0x%02x\n\n",
-            //C[0][0], C[0][1], C[0][2], C[0][3]);
-
-    //printf("D[0][0] = 0x%02x\nD[0][1] = 0x%02x\nD[0][2] = 0x%02x\nD[0][3] = 0x%02x\n\n",
-            //D[0][0], D[0][1], D[0][2], D[0][3]);
-
     // Generate the next 15 C-D pairs by circular shifting
     // using the ISV array
     for(i = 1; i < 17; ++i)
     {
+        // Copy the previous C and D to the current C and D
+        // Then perform the shifting on these
         memcpy(C[i], C[i-1], sizeof(C[i]));
         memcpy(D[i], D[i-1], sizeof(D[i]));
         circular_shift_array(C[i], ISV[i-1]);
         circular_shift_array(D[i], ISV[i-1]);
-
-        //printf("C[%d][0] = 0x%02x\nC[%d][1] = 0x%02x\nC[%d][2] = 0x%02x\nC[%d][3] = 0x%02x\n\n",
-                //i, C[i][0], i, C[i][1], i, C[i][2], i, C[i][3]);
-
-        //printf("D[%d][0] = 0x%02x\nD[%d][1] = 0x%02x\nD[%d][2] = 0x%02x\nD[%d][3] = 0x%02x\n\n",
-                //i, D[i][0], i, D[i][1], i, D[i][2], i, D[i][3]);
         
+        // Combine the C and D arrays to the temp_array
         combine_CD(C[i], D[i], temp_array);
         
-        //printf("i = %d -> temp_array = 0x%02x%02x %02x%02x %02x%02x %02x\n", i,
-                //temp_array[0], temp_array[1], temp_array[2], 
-                //temp_array[3], temp_array[4], temp_array[5], temp_array[6]);
+        // Use PC_2 to get the correct subkey
+        // Need to start the subkey at index 0
+        // Hence the i-1 subscript
         for(j = 0; j < 48; ++j)
         {
             copy_bit(temp_array, subkey[i-1], PC_2[j], j);
         }
-        //printf("%02x%02x %02x%02x %02x%02x\n\n\n", subkey[i-1][0], subkey[i-1][1], subkey[i-1][2], 
-                //subkey[i-1][3], subkey[i-1][4], subkey[i-1][5]);
     }
 }
 
@@ -466,11 +449,17 @@ void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
     // the bit data for the destination
     uint8_t dest_bit_data = source_bit_data << dest_bit_offset;
 
+    // If the the bit needs to be a 1,
+    // then the final byte data just needs to be ORed
+    // for it to work correctly
     if(source_bit_data == 0x1)
     {
         dest_mask = 0x0;
         dest_byte_data = dest_byte_data | (dest_mask | dest_bit_data);
     }
+    // If the bit needs to be a 0, then we need to and it with a mask
+    // of 0x11..0..11 where the 0 is the position where the zero needs
+    // to be.
     else
     {
         dest_mask = ~(0x1 << dest_bit_offset);
@@ -483,14 +472,28 @@ void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
 
 void circular_shift_array(uint8_t array[4], uint8_t shift)
 {
+    // The temp array holds the values that need to be
+    // moved between indices
     uint8_t temp[4];
+    // For DES, there are only two options for this
+    // shifting step: shift left by 1 or shift left
+    // by 2.
     if(shift == 1)
     {
+        // 0bxxxx xxxx.xxxx xxxx.xxxx xxxx.xxxx xxxx
+        //        ^    |         |         |         <- temp[0]
+        //             ^         |         |         <- temp[1]
+        //                       ^         |         <- temp[2]
+        //                                 ^         <- temp[3]
         temp[0] = (array[0] & 0x08) >> 3;
         temp[1] = (array[1] & 0x80) >> 7;
         temp[2] = (array[2] & 0x80) >> 7;
         temp[3] = (array[3] & 0x80) >> 7;
 
+        // This performs the shifting, and carries over the
+        // bits that would have been outside of the operation
+        // for array[0], ANDing with 0x0F perserves the structure
+        // of the array.
         array[0] = (array[0] << shift & 0x0F) | temp[1];
         array[1] = (array[1] << shift) | temp[2];
         array[2] = (array[2] << shift) | temp[3];
@@ -498,6 +501,11 @@ void circular_shift_array(uint8_t array[4], uint8_t shift)
     }
     else if(shift == 2)
     {
+        // 0bxxxx xxxx.xxxx xxxx.xxxx xxxx.xxxx xxxx
+        //        ^^   ||        ||        ||        <- temp[0]
+        //             ^^        ||        ||        <- temp[1]
+        //                       ^^        ||        <- temp[2]
+        //                                 ^^        <- temp[3]
         temp[0] = (array[0] & 0x0C) >> 2;
         temp[1] = (array[1] & 0xC0) >> 6;
         temp[2] = (array[2] & 0xC0) >> 6;
@@ -512,7 +520,12 @@ void circular_shift_array(uint8_t array[4], uint8_t shift)
 
 void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7])
 {
-    uint8_t temp;
+    // Combine the C and D array into one array.
+    // The tricky part here is that the first element
+    // of the C and D array are padded with 4 bits of 0's.
+    // The shifting, ORing, and ANDing take care of this
+    // for the C array. The D array is already aligned correctly
+    // once we get to the second element
     dest[0] = (C[0] << 4) | ((C[1] >> 4) & 0x0F);
     dest[1] = (C[1] << 4) | ((C[2] >> 4) & 0x0F);
     dest[2] = (C[2] << 4) | ((C[3] >> 4) & 0x0F);
