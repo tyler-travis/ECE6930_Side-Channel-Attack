@@ -128,50 +128,25 @@ void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
 void circular_shift_array(uint8_t array[4], uint8_t shift);
 void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
 
-void getPlainText(uint8_t plainText[], uint32_t genNum);
-
-int main(int argc, char** argv)
+int main(void)
 {
     
-    uint8_t key[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1}; // Test key: 1334 5779 9BBC DFF1
+    //uint8_t key[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1}; // Test key: 1334 5779 9BBC DFF1
     uint8_t keyHW[8] = {0x6a, 0x65, 0x78, 0x6A, 0x65, 0x78, 0x6A, 0x65}; //KEY FOR HW SECURITY
-    //uint8_t plain_text[8] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
-    uint8_t plain_text[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    uint8_t plain_text[8] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
     uint16_t plain_text_size = sizeof(plain_text); // plain_text_size = 8 
     uint8_t cipher_text[8];
 
-    uint32_t genNum = 0;
-    uint32_t i = 0;
+    //Run DES Encryption
+    encrypt(plain_text, plain_text_size, cipher_text, keyHW);
 
-    for(i = 0; i < 200000; i++){
-        
-        if(i%20 == 0){
-          getPlainText(plain_text, genNum);
+    printf("Cipher Text: %02x%02x %02x%02x %02x%02x %02x%02x\n", cipher_text[0], cipher_text[1], cipher_text[2], 
+            cipher_text[3], cipher_text[4], cipher_text[5], cipher_text[6], cipher_text[7]);
+		
+		while(1){
+			//DO NOTHING
+		}
 
-          printf("Plain Text: %02x%02x %02x%02x %02x%02x %02x%02x\n", plain_text[0], plain_text[1], plain_text[2], 
-                plain_text[3], plain_text[4], plain_text[5], plain_text[6], plain_text[7]);
-
-          genNum++;
-        }
-
-        //Run DES Encryption
-        encrypt(plain_text, plain_text_size, cipher_text, keyHW);
-
-        printf("Cipher Text: %02x%02x %02x%02x %02x%02x %02x%02x\n", cipher_text[0], cipher_text[1], cipher_text[2], 
-                cipher_text[3], cipher_text[4], cipher_text[5], cipher_text[6], cipher_text[7]);
-    }
-
-}
-
-void getPlainText(uint8_t plainText[], uint32_t genNum){
-    plainText[4] = (genNum & 0xFF000000) >> 24;
-    plainText[5] = (genNum & 0x00FF0000) >> 16;
-    plainText[6] = (genNum & 0x0000FF00) >> 8;
-    plainText[7] = (genNum & 0x000000FF);
-    plainText[0] = 0;
-    plainText[1] = 0;
-    plainText[2] = 0;
-    plainText[3] = 0;
 }
 
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8])
@@ -188,12 +163,12 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     // Create the subkeys from the key
     generate_subkeys(key, subkey);
 
-    //for(i = 0; i < 16; ++i)
-    //{
-    //    printf("subkey[%d] = 0x%02x%02x %02x%02x %02x%02x\n\n", i, 
-    //            subkey[i][0], subkey[i][1], subkey[i][2], 
-    //            subkey[i][3], subkey[i][4], subkey[i][5]);
-    //}
+    for(i = 0; i < 16; ++i)
+    {
+        printf("subkey[%d] = 0x%02x%02x %02x%02x %02x%02x\n\n", i, 
+                subkey[i][0], subkey[i][1], subkey[i][2], 
+                subkey[i][3], subkey[i][4], subkey[i][5]);
+    }
 
     // Send Input through IP (Initial Permutation)
     for(i = 0; i < 64; ++i)
@@ -255,22 +230,10 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     uint8_t temp_array[7];
     uint8_t temp;
 
-<<<<<<< HEAD
-    //printf("%x%x %x%x %x%x %x%x\n", key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7]);
-
-=======
->>>>>>> 61ae59805f2004394b0c69fe9a4644937cb5ec26
     for(i = 0; i < 56; ++i)
     {
         copy_bit(key, permuted_key, PC_1[i], i);
     }
-<<<<<<< HEAD
-    
-
-    //printf("%x%x %x%x %x%x %x\n", permuted_key[0], permuted_key[1], permuted_key[2], 
-    //        permuted_key[3], permuted_key[4], permuted_key[5], permuted_key[6]);
-=======
->>>>>>> 61ae59805f2004394b0c69fe9a4644937cb5ec26
 
     // Initial setup for splitting the key
     // For the C array:
