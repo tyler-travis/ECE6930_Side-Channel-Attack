@@ -128,25 +128,44 @@ void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t de
 void circular_shift_array(uint8_t array[4], uint8_t shift);
 void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
 
-int main(void)
+void getPlainText(uint8_t plainText[], uint32_t genNum);
+
+int main(int argc, char** argv)
 {
     
-    //uint8_t key[8] = {0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1}; // Test key: 1334 5779 9BBC DFF1
     uint8_t keyHW[8] = {0x6a, 0x65, 0x78, 0x6A, 0x65, 0x78, 0x6A, 0x65}; //KEY FOR HW SECURITY
-    uint8_t plain_text[8] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }; // Test message: 0123 4567 89AB CDEF
+    uint8_t plain_text[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+		
     uint16_t plain_text_size = sizeof(plain_text); // plain_text_size = 8 
     uint8_t cipher_text[8];
 
-    //Run DES Encryption
-    encrypt(plain_text, plain_text_size, cipher_text, keyHW);
+    uint32_t genNum = 0;
+    uint32_t i = 0;
 
-    printf("Cipher Text: %02x%02x %02x%02x %02x%02x %02x%02x\n", cipher_text[0], cipher_text[1], cipher_text[2], 
-            cipher_text[3], cipher_text[4], cipher_text[5], cipher_text[6], cipher_text[7]);
-		
-		while(1){
-			//DO NOTHING
-		}
+    for(i = 0; i < 200000; i++){
+        
+        if(i%20 == 0){
+          getPlainText(plain_text, genNum);
 
+          genNum++;
+        }
+
+        //Run DES Encryption
+        encrypt(plain_text, plain_text_size, cipher_text, keyHW);
+				
+    }
+
+}
+
+void getPlainText(uint8_t plainText[], uint32_t genNum){
+    plainText[4] = (genNum & 0xFF000000) >> 24;
+    plainText[5] = (genNum & 0x00FF0000) >> 16;
+    plainText[6] = (genNum & 0x0000FF00) >> 8;
+    plainText[7] = (genNum & 0x000000FF);
+    plainText[0] = 0;
+    plainText[1] = 0;
+    plainText[2] = 0;
+    plainText[3] = 0;
 }
 
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8])
@@ -163,21 +182,11 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     // Create the subkeys from the key
     generate_subkeys(key, subkey);
 
-    for(i = 0; i < 16; ++i)
-    {
-        printf("subkey[%d] = 0x%02x%02x %02x%02x %02x%02x\n\n", i, 
-                subkey[i][0], subkey[i][1], subkey[i][2], 
-                subkey[i][3], subkey[i][4], subkey[i][5]);
-    }
-
     // Send Input through IP (Initial Permutation)
     for(i = 0; i < 64; ++i)
     {
         copy_bit(plain_text, plain_textIP, IP[i], i);
-    }
-
-    //printf("IP: %02x%02x %02x%02x %02x%02x %02x%02x\n", plain_textIP[0], plain_textIP[1], plain_textIP[2], 
-    //        plain_textIP[3], plain_textIP[4], plain_textIP[5], plain_textIP[6], plain_textIP[7]);    
+    } 
 
     // Split 64 bits into two 32 bit chunks (L & R)
     leftHalve[0] = plain_textIP[0];
@@ -194,11 +203,6 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
     for(i = 0; i < 16; i++){
         desRound(leftHalve, rightHalve, subkey[i]);
 
-        //printf("L_%d: %02x%02x %02x%02x\n", i, leftHalve[0], leftHalve[1], leftHalve[2], 
-        //    leftHalve[3]);
-
-        //printf("R_%d: %02x%02x %02x%02x\n", i, rightHalve[0], rightHalve[1], rightHalve[2], 
-        //    rightHalve[3]);
     }
 
     // Recombine final Left and Right Halves
@@ -322,9 +326,6 @@ void fFunction(uint8_t rightHalve[], uint8_t subKey[6]){
         rightHalveE[i] = rightHalveE[i] ^ subKey[i];
     }
 
-    //printf("E: %02x%02x %02x%02x %02x%02x\n", rightHalveE[0], rightHalveE[1], rightHalveE[2], 
-    //        rightHalveE[3], rightHalveE[4], rightHalveE[5]);
-
     //Send output of XOR into Switch Boxes
     //------------------------------------------------------------------------
     // 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111 | 1111 1111
@@ -416,10 +417,6 @@ void fFunction(uint8_t rightHalve[], uint8_t subKey[6]){
     for(i = 0; i < 32; i++){
       copy_bit(post_Sbox_R, rightHalve, P[i], i); 
     }
-
-    //printf("P: %02x%02x %02x%02x\n", rightHalve[0], rightHalve[1], rightHalve[2], 
-    //        rightHalve[3]);
-
     //End of Function
 
 }
