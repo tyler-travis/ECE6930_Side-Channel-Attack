@@ -129,6 +129,7 @@ void circular_shift_array(uint8_t array[4], uint8_t shift);
 void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
 
 void getPlainText(uint8_t plainText[], uint32_t genNum);
+void getPowerTrace(uint8_t leftHalve[], uint8_t rightHalve[]);
 
 int main(int argc, char** argv)
 {
@@ -232,7 +233,7 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     uint8_t C[17][4];
     uint8_t D[17][4];
     uint8_t temp_array[7];
-    uint8_t temp;
+    //uint8_t temp;
 
     for(i = 0; i < 56; ++i)
     {
@@ -293,10 +294,7 @@ void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]){
     fFunction(rightHalve, subkey);
 
     //XOR Output of fFunction() with L_i
-    rightHalve[0] = rightHalve[0] ^ leftHalve[0];
-    rightHalve[1] = rightHalve[1] ^ leftHalve[1];
-    rightHalve[2] = rightHalve[2] ^ leftHalve[2];
-    rightHalve[3] = rightHalve[3] ^ leftHalve[3];
+    getPowerTrace(leftHalve, rightHalve);
 
     //Make L_i+1 = R_i for next round
     leftHalve[0] = rightTemp[0];
@@ -418,6 +416,23 @@ void fFunction(uint8_t rightHalve[], uint8_t subKey[6]){
       copy_bit(post_Sbox_R, rightHalve, P[i], i); 
     }
     //End of Function
+
+}
+
+void getPowerTrace(uint8_t leftHalve[], uint8_t rightHalve[]){
+		
+	/*	
+	rightHalve[0] = rightHalve[0] ^ leftHalve[0];
+	rightHalve[1] = rightHalve[1] ^ leftHalve[1];
+	rightHalve[2] = rightHalve[2] ^ leftHalve[2];
+	rightHalve[3] = rightHalve[3] ^ leftHalve[3];
+	*/
+	
+	//TO DO: Write assembly routine of comment lines above (include GPIO trigger)
+		__asm
+		{
+	  nop;
+		}
 
 }
 
