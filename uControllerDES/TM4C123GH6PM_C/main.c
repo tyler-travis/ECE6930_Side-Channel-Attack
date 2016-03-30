@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "TM4C123GH6PM.h"
 
 const uint8_t IP[64] = {57, 49, 41, 33, 25, 17, 9,  1,
                         59, 51, 43, 35, 27, 19, 11, 3,
@@ -122,7 +123,7 @@ const uint8_t S_box8[4][16] = {
 void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text, uint8_t key[8]);
 void decrypt(uint8_t *plain_text, uint8_t *cipher_text, uint8_t key[8]);
 void generate_subkeys(uint8_t key[8], uint8_t subkey[][6]);
-void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]);
+void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6], uint8_t i);
 void fFunction(uint8_t rightHalve[], uint8_t subKey[6]);
 void copy_bit(uint8_t source[], uint8_t dest[], uint16_t source_bit, uint16_t dest_bit);
 void circular_shift_array(uint8_t array[4], uint8_t shift);
@@ -130,6 +131,7 @@ void combine_CD(uint8_t C[4], uint8_t D[4], uint8_t dest[7]);
 
 void getPlainText(uint8_t plainText[], uint32_t genNum);
 void getPowerTrace(uint8_t leftHalve[], uint8_t rightHalve[]);
+void GPIO_Init(void);
 
 int main(int argc, char** argv)
 {
@@ -142,6 +144,18 @@ int main(int argc, char** argv)
 
     uint32_t genNum = 0;
     uint32_t i = 0;
+		uint32_t j = 0;
+		
+		GPIO_Init();
+		
+		GPIOC->DATA |= (0x1 << 4);
+		
+		
+		for(i = 0; i < 16000000;){
+			//WAIT FOR REAL TRIGGER
+			++i;
+		}
+		
 
     for(i = 0; i < 200000; i++){
         
@@ -154,8 +168,28 @@ int main(int argc, char** argv)
         //Run DES Encryption
         encrypt(plain_text, plain_text_size, cipher_text, keyHW);
 				
+				for(j = 0; j < 2500000;){
+					//WAIT FOR REAL TRIGGER
+					++j;
+				}
+				
+				
     }
 
+}
+
+void GPIO_Init(void){
+	//		DirPin PWM0: C4
+	//		DirPin PWM1: C5
+	//		DirPin PWM2: C6
+	
+	//Enable GPIO CLK Port C  (PIN C4)
+	SYSCTL->RCGC2 |= 0x1<<2;
+	//OUTPUT for DIR PC4
+	GPIOC->DIR = 0x1 << 4;
+	//GPIO DEN
+	GPIOC->DEN = 0x1<<4;
+	
 }
 
 void getPlainText(uint8_t plainText[], uint32_t genNum){
@@ -202,7 +236,7 @@ void encrypt(uint8_t *plain_text, uint16_t plain_text_size, uint8_t *cipher_text
 
     // Round 1 through 16
     for(i = 0; i < 16; i++){
-        desRound(leftHalve, rightHalve, subkey[i]);
+        desRound(leftHalve, rightHalve, subkey[i], i);
 
     }
 
@@ -280,7 +314,7 @@ void generate_subkeys(uint8_t key[8], uint8_t subkey[][6])
     }
 }
 
-void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]){
+void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6], uint8_t i){
 
     uint8_t rightTemp[4];
 
@@ -294,7 +328,15 @@ void desRound(uint8_t leftHalve[], uint8_t rightHalve[], uint8_t subkey[6]){
     fFunction(rightHalve, subkey);
 
     //XOR Output of fFunction() with L_i
-    getPowerTrace(leftHalve, rightHalve);
+		if(i != 15){	
+			rightHalve[0] = rightHalve[0] ^ leftHalve[0];
+			rightHalve[1] = rightHalve[1] ^ leftHalve[1];
+			rightHalve[2] = rightHalve[2] ^ leftHalve[2];
+			rightHalve[3] = rightHalve[3] ^ leftHalve[3];
+		}
+		else{
+			getPowerTrace(leftHalve, rightHalve);
+		}
 
     //Make L_i+1 = R_i for next round
     leftHalve[0] = rightTemp[0];
@@ -428,11 +470,86 @@ void getPowerTrace(uint8_t leftHalve[], uint8_t rightHalve[]){
 	rightHalve[3] = rightHalve[3] ^ leftHalve[3];
 	*/
 	
-	//TO DO: Write assembly routine of comment lines above (include GPIO trigger)
+	uint32_t left = (leftHalve[0] << 24 | leftHalve[1] << 16 | leftHalve[2] << 8 | leftHalve[3]);
+	uint32_t right = (rightHalve[0] << 24 | rightHalve[1] << 16 | rightHalve[2] << 8 | rightHalve[3]);
+	
+	uint32_t xorDest = 0;
+	
+//	0x000003F0 2200      MOVS          r2,#0x00
+//   463:         GPIOC->DATA &= ~(0x1 << 4); 
+//   464:         __asm 
+//   465:                 { 
+//0x000003F2 4DFD      LDR           r5,[pc,#1012]  ; @0x000007E8
+//0x000003F4 682D      LDR           r5,[r5,#0x00]
+//0x000003F6 F0250510  BIC           r5,r5,#0x10
+//0x000003FA 4EFC      LDR           r6,[pc,#1008]  ; @0x000007EC
+//0x000003FC F8C653FC  STR           r5,[r6,#0x3FC]
+//   466:           nop; 
+//   467:                 } 
+//   468:                 __asm 
+//   469:                 { 
+//0x00000400 BF00      NOP           
+//   470:           nop; 
+//   471:                 } 
+//   472:                  
+//0x00000402 BF00      NOP           
+//   473:                 xorDest = left ^ right; 
+//   474:                  
+//0x00000404 EA840203  EOR           r2,r4,r3
+//   475:         GPIOC->DATA |= (0x1 << 4); 
+//   476:          
+//   477:         __asm 
+//   478:                 { 
+//0x00000408 4DF8      LDR           r5,[pc,#992]  ; @0x000007EC
+//0x0000040A F8D553FC  LDR           r5,[r5,#0x3FC]
+//0x0000040E F0450510  ORR           r5,r5,#0x10
+//0x00000412 4EF6      LDR           r6,[pc,#984]  ; @0x000007EC
+//0x00000414 F8C653FC  STR           r5,[r6,#0x3FC]
+	
+	GPIOC->DATA &= ~(0x1 << 4);
+	__asm
+		{
+	  nop;
+		}
 		__asm
 		{
 	  nop;
 		}
+		__asm
+		{
+	  nop;
+		}
+		__asm
+		{
+	  nop;
+		}
+		
+		xorDest = left ^ right;
+		
+	GPIOC->DATA |= (0x1 << 4);
+	
+	__asm
+		{
+	  nop;
+		}
+		
+		__asm
+		{
+	  nop;
+		}
+		__asm
+		{
+	  nop;
+		}
+		__asm
+		{
+	  nop;
+		}
+		
+		rightHalve[0] = (xorDest & 0xFF000000) >> 24;
+		rightHalve[1] = (xorDest & 0x00FF0000) >> 16;
+		rightHalve[2] = (xorDest & 0x0000FF00) >> 8;
+		rightHalve[3] = (xorDest & 0x000000FF);
 
 }
 
