@@ -73,23 +73,31 @@ ave1 = zeros(64, 2501);
 ave0 = zeros(64, 2501);
 
 %sboxMask = uint32(hex2dec(['00808202' '40084010' '04010104' '80401040' '21040080' '10202008' '02100401' '08020820']));
-sboxBits = [9 13 24 26 8 4 32 5];
+%sboxBits = [9 13 24 26 8 4 32 5];
 
-sbox1Bits = [9 17 23 31];
-sbox2Bits = [13 28 2 18];
-sbox3Bits = [24 16 30 6];
-sbox4Bits = [26 20 10 1];
-sbox5Bits = [8 14 25 3];
-sbox6Bits = [4 29 11 19];
-sbox7Bits = [32 12 22 7];
-sbox8Bits = [5 27 15 21];
+sboxBitsArray = [9 17 23 31; ...
+                13 28 2 18; ...
+                24 16 30 6; ...
+                26 20 10 1; ...
+                8 14 25 3; ...
+                4 29 11 19; ...
+                32 12 22 7; ...
+                5 27 15 21];
 
 dbit = uint32(zeros(10000, 64));
-sets = uint32(zeros(10000, 64));
+%sets = uint32(zeros(10000, 64));
+setB1 = uint32(zeros(10000, 64));
+setB2 = uint32(zeros(10000, 64));
+setB3 = uint32(zeros(10000, 64));
+setB4 = uint32(zeros(10000, 64));
 for sbox = 1:8
     for key = 1:64
         disp(['Key: ' num2str(key)]);
         dbit(:,key) = bitxor(left(:), fFunction_output(:,key));
+        setB1(:,key) = bitget(dbit(:,key), sboxBitsArray(sbox,1));
+        setB2(:,key) = bitget(dbit(:,key), sboxBitsArray(sbox,2));
+        setB3(:,key) = bitget(dbit(:,key), sboxBitsArray(sbox,3));
+        setB4(:,key) = bitget(dbit(:,key), sboxBitsArray(sbox,4));
 %        sets(:,key) = bitget(dbit(:,key), sboxBits(sbox));
 %        size1 = sum(sets(:,key));
 %        size0 = 10000 - size1;
@@ -98,10 +106,10 @@ for sbox = 1:8
         counter0 = 1;
         counter1 = 1;
         for i = 1:10000
-            if (sets(i,key) == 1)
+            if (setB1(i,key) == 1 && setB2(i,key) == 1 && setB3(i,key) == 1 && setB4(i,key) == 1)
                 S1(counter1,:) = traceAv(i,:);
                 counter1 = counter1 + 1;
-            else
+            elseif (setB1(i,key) == 0 && setB2(i,key) == 0 && setB3(i,key) == 0 && setB4(i,key) == 0)
                 S0(counter0,:) = traceAv(i,:);
                 counter0 = counter0 + 1;
             end
