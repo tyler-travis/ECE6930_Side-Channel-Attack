@@ -79,10 +79,10 @@ sbox1Bits = [9 17 23 31];
 sbox2Bits = [13 28 2 18];
 sbox3Bits = [24 16 30 6];
 sbox4Bits = [26 20 10 1];
-sbox5Bits = [8 14 25 3];
-sbox6Bits = [4 29 11 19];
-sbox7Bits = [32 12 22 7];
-sbox8Bits = [5 27 15 21];
+sbox5Bits = [8];
+sbox6Bits = [4];
+sbox7Bits = [32];
+sbox8Bits = [5];
 
 dbit = uint32(zeros(10000, 64));
 sets = uint32(zeros(10000, 64));
