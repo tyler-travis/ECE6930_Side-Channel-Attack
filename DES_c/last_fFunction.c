@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     uint32_t left;
     uint32_t i, j, h;
 
-    for(i = 0; (fscanf(left_right_last, "%uX\t%uX", &left, &right) != EOF) && i < 10000; ++i)
+    for(i = 0; (fscanf(left_right_last, "%X\t%X", &left, &right) != EOF) && i < 10000; ++i)
     {
         left_array[i][0] = (left & 0xFF000000) >> 24;
         left_array[i][1] = (left & 0x00FF0000) >> 16;
@@ -111,6 +111,7 @@ int main(int argc, char** argv)
             fprintf(fFunction_out, "%02X%02X%02X%02X, ", right_array[i][0], right_array[i][1], right_array[i][2], right_array[i][3]);
             printf("%02X%02X%02X%02X, ", right_array[i][0], right_array[i][1], right_array[i][2], right_array[i][3]);
         }
+        fprintf(fFunction_out, "\r\n");
         printf("\r\n");
     }
 

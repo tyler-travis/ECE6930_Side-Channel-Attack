@@ -47,23 +47,23 @@ file_fFunction_out = 'DES_c/fFunction_output_text';
 fileID = fopen(file_fFunction_out, 'r');
 dataArray = textscan(fileID, '%s', 'Delimiter', ',', 'ReturnOnError', false);
 
-fFunction_output = zeros(10000,64);
+fFunction_output = uint32(zeros(10000,64));
 
 for i = 1:10000
     for j = 1:64
-        fFunction_output(i,j) = uint32(hex2dec(dataArray{1,1}(j*i)));
+        fFunction_output(i,j) = uint32(hex2dec(dataArray{1,1}((i-1)*64+j)));
         fFunction_outputHEX(i,j) = dataArray{1,1}((i-1)*64+j);
     end
 end
 
-clearvar('dataArray');
+clearvars('dataArray');
 
 fclose(fileID);
 
 %Perform DPA
 %   0xf0be2e5b242c
 %   111100  001011  111000  101110  010110  110010  010000  101100
-correctKey = [60 11 56 46 22 50 16 44];
+correctKey = [61 12 57 47 23 51 17 45];
 
 ave1 = zeros(64, 2501);
 ave0 = zeros(64, 2501);
