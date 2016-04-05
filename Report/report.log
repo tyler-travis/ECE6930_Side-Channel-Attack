@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.14)  3 APR 2016 20:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.14)  4 APR 2016 19:28
 entering extended mode
 **report.tex
 (report.tex
@@ -249,56 +249,104 @@ Package: multicol 2014/10/28 v1.8i multicolumn formatting (FMi)
 \mult@nat@firstbox=\box53
 \colbreak@box=\box54
 \mc@col@check@num=\count112
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\listings.sty"
+\lst@mode=\count113
+\lst@gtempboxa=\box55
+\lst@token=\toks21
+\lst@length=\count114
+\lst@currlwidth=\dimen133
+\lst@column=\count115
+\lst@pos=\count116
+\lst@lostspace=\dimen134
+\lst@width=\dimen135
+\lst@newlines=\count117
+\lst@lineno=\count118
+\lst@maxwidth=\dimen136
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstmisc.sty"
+File: lstmisc.sty 2014/09/06 1.5e (Carsten Heinz)
+\c@lstnumber=\count119
+\lst@skipnumbers=\count120
+\lst@framebox=\box56
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\listings.cfg"
+File: listings.cfg 2014/09/06 1.5e listings configuration
+))
+Package: listings 2014/09/06 1.5e (Carsten Heinz)
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\color.sty"
+Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\color.cfg"
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package color Info: Driver file: pdftex.def on input line 137.
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
+File: lstlang1.sty 2014/09/06 1.5e listings language file
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstmisc.sty"
+File: lstmisc.sty 2014/09/06 1.5e (Carsten Heinz)
 ) (report.aux)
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 62.
+LaTeX Font Info:    ... okay on input line 62.
 
 ("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count113
-\scratchdimen=\dimen133
-\scratchbox=\box55
-\nofMPsegments=\count114
-\nofMParguments=\count115
-\everyMPshowfont=\toks21
-\MPscratchCnt=\count116
-\MPscratchDim=\dimen134
-\MPnumerator=\count117
-\makeMPintoPDFobject=\count118
-\everyMPtoPDFconversion=\toks22
-) <DesRounds.png, id=1, 493.0922pt x 483.30562pt>
+\scratchcounter=\count121
+\scratchdimen=\dimen137
+\scratchbox=\box57
+\nofMPsegments=\count122
+\nofMParguments=\count123
+\everyMPshowfont=\toks22
+\MPscratchCnt=\count124
+\MPscratchDim=\dimen138
+\MPnumerator=\count125
+\makeMPintoPDFobject=\count126
+\everyMPtoPDFconversion=\toks23
+)
+\c@lstlisting=\count127
+ <DesRounds.png, id=1, 493.0922pt x 483.30562pt>
 File: DesRounds.png Graphic file (type png)
  <use DesRounds.png>
-Package pdftex.def Info: DesRounds.png used on input line 77.
+Package pdftex.def Info: DesRounds.png used on input line 100.
 (pdftex.def)             Requested size: 246.54549pt x 241.65222pt.
 
-Overfull \hbox (0.82738pt too wide) in paragraph at lines 77--78
+Overfull \hbox (0.82738pt too wide) in paragraph at lines 100--101
  [][] 
  []
 
 <Ffunction.png, id=3, 451.6875pt x 454.69875pt>
 File: Ffunction.png Graphic file (type png)
  <use Ffunction.png>
-Package pdftex.def Info: Ffunction.png used on input line 85.
+Package pdftex.def Info: Ffunction.png used on input line 108.
 (pdftex.def)             Requested size: 225.84319pt x 227.34882pt.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 116.
 
-Overfull \vbox (336.63313pt too high) has occurred while \output is active []
 
-
-[1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
+("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\ot1pcr.fd"
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+) [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
  <./DesRounds.png>]
+<setup.jpg, id=14, 1842.885pt x 2392.94pt>
+File: setup.jpg Graphic file (type jpg)
+ <use setup.jpg>
+Package pdftex.def Info: setup.jpg used on input line 152.
+(pdftex.def)             Requested size: 184.29929pt x 239.30801pt.
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -310,25 +358,24 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the US letter (8.5in X 11in) paper size.
 
-[2
-
- <./Ffunction.png>] (report.aux) ) 
+[2 <./Ffunction.png> <./setup.jpg>] (report.aux) ) 
 Here is how much of TeX's memory you used:
- 2673 strings out of 493698
- 36533 string characters out of 3144408
- 100967 words of memory out of 3000000
- 6009 multiletter control sequences out of 15000+200000
- 35250 words of font info for 64 fonts, out of 3000000 for 9000
+ 4111 strings out of 493698
+ 57346 string characters out of 3144408
+ 159781 words of memory out of 3000000
+ 7419 multiletter control sequences out of 15000+200000
+ 35765 words of font info for 66 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 27i,8n,26p,666b,295s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/
-fontname/8r.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><
-C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/Program Files
-/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts
-/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (2 pages, 92867 bytes).
+ 27i,9n,49p,666b,1520s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/
+fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/urw/co
+urier/ucrr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb>
+<C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/Program File
+s/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/font
+s/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (2 pages, 365924 bytes).
 PDF statistics:
- 31 PDF objects out of 1000 (max. 8388607)
+ 36 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

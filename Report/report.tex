@@ -35,6 +35,29 @@ Side Channel Power Analysis of an Embedded Device Running DES
 \\ \small{email: justin.n.cox@gmail.com, tyler.travis@aggiemail.usu.edu}
 }
 
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=none,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \begin{document}
 
@@ -83,20 +106,59 @@ During each round, the left 32-bit halve is XORed with the sub key corresponding
 \begin{figure}[thpb]
 	\centering
 	\includegraphics[scale=.50]{Ffunction}
-    \caption{An illustration of the F-function}
+    \caption{An illustration of the F-function.}
 \end{figure}
 
 \subsection{Modifications}
 
+There were a few minor changes made to the DES algorithm to facilitate the capturing of power traces.  These changes do not decrease the security of the DES algorithm.  The following assembly routine was added during the last round of the DES algorithm: 
+
+\begin{lstlisting}
+	MOVS		r2,#0x00	;Set r2 = 0 
+	LDR     	r5,[pc,#1012]	;Lower GPIO PIN  
+	LDR		r5,[r5,#0x00]
+	BIC     	r5,r5,#0x10
+	LDR     	r6,[pc,#1008]  
+	STR     	r5,[r6,#0x3FC]
+ 
+ 	NOP           
+   NOP
+   NOP           
+   NOP                             
+    
+   EOR      r2,r4,r3	;<--Instruction of Interest
+ 
+	LDR 		r5,[pc,#992]	;Set GPIO Pin High  
+	LDR    	r5,[r5,#0x3FC]
+	ORR    	r5,r5,#0x10
+	LDR     	r6,[pc,#984]  
+	STR     	r5,[r6,#0x3FC]
+	
+	NOP           
+   NOP
+   NOP           
+   NOP
+	
+\end{lstlisting}
+
+\noindent
+A GPIO pin on the microcontroller is transitioned from a high to a low in order to trigger the oscilloscope to capture the XOR operation that works with the bits of interest for the DPA.  The register that holds the value of the XOR is explicitly set to 0x00 in order to make it easier to measure the Hamming Weight and Distance of that register.  This information is helpful for a Correlation Power Analysis (CPA).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{EXPERIMENTAL SETUP}
- 
+
+\begin{figure}[thpb]
+	\centering
+	\includegraphics[scale=.1]{setup}
+    \caption{A picture taken of the experimental setup used.}
+\end{figure} 
 
 \section{POWER TRACE ANALYSIS}
 
 
 \section{RESULTS}
  
+ %4bit 1: 677 0: 644
 
 \section{CONCLUSION}
 
