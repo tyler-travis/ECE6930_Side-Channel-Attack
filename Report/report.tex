@@ -189,13 +189,13 @@ For some of the Sboxes, it is possible to limit the 64 key guesses down to a cou
 
 \subsection{DPA 4-bit}
 
-For the 4-bit DPA implementation, there is only one Sbox that the correct key could be limited to a couple of guesses.  Once again, the High-Resolution traces yield a better result.
+For the 4-bit DPA implementation, there is only one Sbox that the correct key could be limited to a couple of guesses.  This is due to the small amount of traces that were used after the subset sorting.  Once again, the High-Resolution traces yield a better result.
 
 
 \section{CONCLUSION}
 
-Some improvements for a future implementation of a DPA attack on a microcontroller running DES would be to use a better differential oscilloscope probe setup for power analysis. One of the channels was jumping around the viewing screen, which clipped some of the trace measurements during the recording process. Another improvement would be to get more traces during the record process. 4-bit DPA analysis should produce more accurate results than 1-bit DPA but using 4-bit DPA only results
-in around 1,300 traces, while the 1-bt DPA uses about 10,000 traces. For the 4-bit DPA to be accurate, there would need to be at least an order of magnitude more traces sampled.
+Some improvements for a future implementation of a DPA attack on a microcontroller running DES would be to use a better differential oscilloscope probe setup for power analysis. One of the channels was jumping around the viewing screen, which clipped some of the trace measurements during the recording process. Another improvement would be to acquire more traces during the recording process. DPA using four bits should produce more accurate and apparent results than DPA using one bit. However, using 4-bit DPA only results
+in around 1,300 usable traces, while the 1-bit DPA uses around 10,000 traces. For the 4-bit DPA to be accurate, there would need to be at least an order of magnitude more traces sampled.
 
 
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths

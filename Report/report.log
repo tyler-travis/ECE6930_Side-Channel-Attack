@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.14)  4 APR 2016 20:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.14)  4 APR 2016 21:02
 entering extended mode
 **report.tex
 (report.tex
@@ -346,7 +346,72 @@ File: setup.jpg Graphic file (type jpg)
  <use setup.jpg>
 Package pdftex.def Info: setup.jpg used on input line 160.
 (pdftex.def)             Requested size: 184.29929pt x 239.30801pt.
- [2 <./Ffunction.png> <./setup.jpg>]
+ [2 <./Ffunction.png> <./setup.jpg>] <SBox_NormRes_1bit.png, id=19, 1215.54124p
+t x 731.73375pt>
+File: SBox_NormRes_1bit.png Graphic file (type png)
+
+<use SBox_NormRes_1bit.png>
+Package pdftex.def Info: SBox_NormRes_1bit.png used on input line 242.
+(pdftex.def)             Requested size: 546.98851pt x 329.27715pt.
+
+Overfull \hbox (301.2704pt too wide) in paragraph at lines 242--243
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 6.44214pt on input line 244.
+
+[3 <./SBox_NormRes_1bit.png>]
+<SBox_NormRes_4bit.png, id=24, 1222.5675pt x 733.74126pt>
+File: SBox_NormRes_4bit.png Graphic file (type png)
+
+<use SBox_NormRes_4bit.png>
+Package pdftex.def Info: SBox_NormRes_4bit.png used on input line 252.
+(pdftex.def)             Requested size: 550.1503pt x 330.18051pt.
+
+Overfull \hbox (304.43219pt too wide) in paragraph at lines 252--253
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 7.3455pt on input line 254.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4 <./SBox_NormRes_4bit.png>] <SBox_HiRes_1bit.png, id=29, 1214.5375pt x 754.8
+2pt>
+File: SBox_HiRes_1bit.png Graphic file (type png)
+
+<use SBox_HiRes_1bit.png>
+Package pdftex.def Info: SBox_HiRes_1bit.png used on input line 262.
+(pdftex.def)             Requested size: 546.53683pt x 339.66586pt.
+
+Overfull \hbox (300.81873pt too wide) in paragraph at lines 262--263
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 16.83086pt on input line 264.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5 <./SBox_HiRes_1bit.png>] <SBox_HiRes_4bit.png, id=34, 1219.55624pt x 731.73
+375pt>
+File: SBox_HiRes_4bit.png Graphic file (type png)
+
+<use SBox_HiRes_4bit.png>
+Package pdftex.def Info: SBox_HiRes_4bit.png used on input line 272.
+(pdftex.def)             Requested size: 548.79524pt x 329.27715pt.
+
+Overfull \hbox (303.07713pt too wide) in paragraph at lines 272--273
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 6.44214pt on input line 274.
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -358,23 +423,24 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the US letter (8.5in X 11in) paper size.
 
-[3] (report.aux) ) 
+[6 <./SBox_HiRes_4bit.png>] (report.aux) ) 
 Here is how much of TeX's memory you used:
- 4111 strings out of 493698
- 57346 string characters out of 3144408
+ 4130 strings out of 493698
+ 57814 string characters out of 3144408
  161781 words of memory out of 3000000
- 7419 multiletter control sequences out of 15000+200000
+ 7434 multiletter control sequences out of 15000+200000
  35765 words of font info for 66 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
  27i,9n,49p,666b,1520s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}
-<C:/Program Files/MiKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/Program Fil
-es/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fon
-ts/type1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/tim
-es/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (3 pages, 370841 bytes).
+{C:/Program Files/MiKTeX 2.9/fonts/en
+c/dvips/fontname/8r.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/urw/courier/uc
+rr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Prog
+ram Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+urw/times/utmri8a.pfb>
+Output written on report.pdf (6 pages, 704545 bytes).
 PDF statistics:
- 39 PDF objects out of 1000 (max. 8388607)
+ 56 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
