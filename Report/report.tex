@@ -71,7 +71,7 @@ Side Channel Power Analysis of an Embedded Device Running DES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
 
-Hardware security is an ever increasing area of study since exploits have been found on computer systems.  Encryption algorithms are very difficult to break.  Instead of breaking the encryption algorithm, it is common for an attacker to attempt to recover the encryption key instead.  One way of recovering the key is using side channel analysis    .  This paper will discuss a side channel analysis performed on a microcontroller that is operating as a crypto device.  The power traces collected will then be analyzed using Differential Power Analysis (DPA) and the results will be shown and discussed.
+Hardware security is an ever increasing area of study since exploits have been found on computer systems.  Encryption algorithms are very difficult to break.  Instead of breaking the encryption algorithm, it is common for an attacker to attempt to recover the encryption key instead.  One way of recovering the key is using side channel analysis.  This paper will discuss a side channel analysis performed on a microcontroller that is operating as a crypto device.  The power traces collected will then be analyzed using Differential Power Analysis (DPA) and the results will be shown and discussed.
 
 \emph{Index Terms}---encryption, decryption, security, DPA, side channel.
 
@@ -165,7 +165,7 @@ The oscilloscope that was used was able to sample at a rate of 2.5 GHz.  The Tiv
 
 \subsection{DPA}
 
-The power traces were uploaded into MATLAB and DPA was used to analysis the data.  There are papers which discuss DPA on the DES algorithm and the authors of this paper perform a similar method [2].
+The power traces were uploaded into MATLAB and DPA was used to analyize the data.  There are papers which discuss DPA on the DES algorithm and the authors of this paper perform a similar method [2].
 
 In order to perform the analysis, a DES round must be chosen.  Since the plaintext values and the cyphertext values are known, it is recommended to choose the first or last round of the DES algorithm.  This paper has chosen to analysis the last round of the DES algorithm.  In order to recover the key, an operation that contains the data from the subkeys must be chosen.  This paper will focus on the last round's XOR operation that takes the F-function's output and the left halve of the cyphertext output as its inputs.
 
